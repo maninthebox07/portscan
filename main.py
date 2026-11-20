@@ -62,6 +62,11 @@ elif "," in PORT:
 
     try:
         for port in PORT:
+            if not validate_port(int(port)):
+                print("Error: the port numbers on the list must be between 1-65535.")
+                sys.exit()
+
+        for port in PORT:
             portscan(TARGET, int(port))
     except ValueError:
         print("Error: invalid entry. Please, enter a valid port number.")
