@@ -44,7 +44,11 @@ if "-" in PORT:
     PORT = PORT.split("-")
 
     try:
-        if validate_port(int(PORT[0])) and validate_port(int(PORT[1])):
+        if (
+            validate_port(int(PORT[0]))
+            and validate_port(int(PORT[1]))
+            and int(PORT[0]) <= int(PORT[1])
+        ):
             for port in range(int(PORT[0]), int(PORT[1]) + 1):
                 portscan(TARGET, port)
         else:
