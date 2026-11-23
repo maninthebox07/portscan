@@ -1,8 +1,8 @@
 import socket
+import sys
 
 def validate_port(port):
     return not (port < 1 or port > 65535)
-
 
 def portscan(h, p):
     if not validate_port(p):

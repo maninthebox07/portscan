@@ -1,32 +1,38 @@
 import socket
 import sys
 import ipaddress
+import argparse
 from scanner import validate_port, portscan
 
-HOST = input("Enter a host: ")
-PORT = input("Enter a port: ")
 TARGET = None
 
+parser = argparse.ArgumentParser()
+
+parser.add_argument("host")
+parser.add_argument("-p", "--port", required=True)
+
+args = parser.parse_args()
+
 try:
-    TARGET = str(ipaddress.ip_address(HOST))
+    TARGET = str(ipaddress.ip_address(args.host))
 except ValueError:
     try:
-        TARGET = socket.getaddrinfo(HOST, None, socket.AF_INET)
+        TARGET = socket.getaddrinfo(args.host, None, socket.AF_INET)
         TARGET = TARGET[0][4][0]
     except socket.gaierror:
         print("Error: unable to resolve host.")
         sys.exit()
 
-if "-" in PORT:
-    PORT = PORT.split("-")
+if "-" in args.port:
+    args.port = args.port.split("-")
 
     try:
         if (
-            validate_port(int(PORT[0]))
-            and validate_port(int(PORT[1]))
-            and int(PORT[0]) <= int(PORT[1])
+            validate_port(int(args.port[0]))
+            and validate_port(int(args.port[1]))
+            and int(args.port[0]) <= int(args.port[1])
         ):
-            for port in range(int(PORT[0]), int(PORT[1]) + 1):
+            for port in range(int(args.port[0]), int(args.port[1]) + 1):
                 portscan(TARGET, port)
         else:
             print("Error: invalid entry. Please, enter a valid interval.")
@@ -34,22 +40,22 @@ if "-" in PORT:
     except ValueError:
         print("Error: invalid entry. Please, enter a valid interval.")
         sys.exit()
-elif "," in PORT:
-    PORT = PORT.split(",")
+elif "," in args.port:
+    args.port = args.port.split(",")
 
     try:
-        for port in PORT:
+        for port in args.port:
             if not validate_port(int(port)):
                 print("Error: the port numbers on the list must be between 1-65535.")
                 sys.exit()
 
-        for port in PORT:
+        for port in args.port:
             portscan(TARGET, int(port))
     except ValueError:
         print("Error: invalid entry. Please, enter a valid port number.")
 else:
     try:
-        portscan(TARGET, int(PORT))
+        portscan(TARGET, int(args.port))
     except ValueError:
         print("Error: invalid entry. Please, enter a valid port number.")
         sys.exit()
