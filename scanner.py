@@ -4,13 +4,13 @@ import sys
 def validate_port(port):
     return not (port < 1 or port > 65535)
 
-def portscan(h, p):
+def portscan(h, p, t=0.5):
     if not validate_port(p):
         print("Error: the port number must be between 1-65535.")
         sys.exit()
     else:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(0.5)
+        s.settimeout(t)
 
         try:
             s.connect((h, p))

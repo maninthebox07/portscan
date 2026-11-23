@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("host")
 parser.add_argument("-p", "--port", required=True)
+parser.add_argument("-t", "--timeout", type=float, default=0.5)
 
 args = parser.parse_args()
 
@@ -33,7 +34,7 @@ if "-" in args.port:
             and int(args.port[0]) <= int(args.port[1])
         ):
             for port in range(int(args.port[0]), int(args.port[1]) + 1):
-                portscan(TARGET, port)
+                portscan(TARGET, port, args.timeout)
         else:
             print("Error: invalid entry. Please, enter a valid interval.")
 
@@ -50,12 +51,12 @@ elif "," in args.port:
                 sys.exit()
 
         for port in args.port:
-            portscan(TARGET, int(port))
+            portscan(TARGET, int(port), args.timeout)
     except ValueError:
         print("Error: invalid entry. Please, enter a valid port number.")
 else:
     try:
-        portscan(TARGET, int(args.port))
+        portscan(TARGET, int(args.port), args.timeout)
     except ValueError:
         print("Error: invalid entry. Please, enter a valid port number.")
         sys.exit()
