@@ -2,7 +2,7 @@ import socket
 import sys
 import ipaddress
 import argparse
-from scanner import validate_port, portscan
+from scanner import parse_ports, portscan
 
 TARGET = None
 
@@ -22,41 +22,13 @@ except ValueError:
         TARGET = TARGET[0][4][0]
     except socket.gaierror:
         print("Error: unable to resolve host.")
-        sys.exit()
+        sys.exit(1)
 
-if "-" in args.port:
-    args.port = args.port.split("-")
+try:
+    ports = parse_ports(args.port)
+except ValueError as e:
+    print(e)
+    sys.exit(1)
 
-    try:
-        if (
-            validate_port(int(args.port[0]))
-            and validate_port(int(args.port[1]))
-            and int(args.port[0]) <= int(args.port[1])
-        ):
-            for port in range(int(args.port[0]), int(args.port[1]) + 1):
-                portscan(TARGET, port, args.timeout)
-        else:
-            print("Error: invalid entry. Please, enter a valid interval.")
-
-    except ValueError:
-        print("Error: invalid entry. Please, enter a valid interval.")
-        sys.exit()
-elif "," in args.port:
-    args.port = args.port.split(",")
-
-    try:
-        for port in args.port:
-            if not validate_port(int(port)):
-                print("Error: the port numbers on the list must be between 1-65535.")
-                sys.exit()
-
-        for port in args.port:
-            portscan(TARGET, int(port), args.timeout)
-    except ValueError:
-        print("Error: invalid entry. Please, enter a valid port number.")
-else:
-    try:
-        portscan(TARGET, int(args.port), args.timeout)
-    except ValueError:
-        print("Error: invalid entry. Please, enter a valid port number.")
-        sys.exit()
+for port in ports:
+    portscan(TARGET, port, args.timeout)
