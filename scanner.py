@@ -1,8 +1,10 @@
 import socket
 import sys
 
+
 def validate_port(port):
     return not (port < 1 or port > 65535)
+
 
 def parse_ports(port_spec):
     ports = []
@@ -13,9 +15,9 @@ def parse_ports(port_spec):
             start, end = int(start), int(end)
         except ValueError:
             raise ValueError("Error: invalid port interval")
-        
+
         if start <= end:
-            ports = list(range(start, end +1))
+            ports = list(range(start, end + 1))
         else:
             raise ValueError("Error: invalid port interval")
 
@@ -35,10 +37,11 @@ def parse_ports(port_spec):
     for port in ports:
         if not validate_port(port):
             raise ValueError("Error: invalid entry")
-    
+
     return ports
 
-def portscan(h, p, t=0.5):
+
+def portscan(p, h, t=0.5):
     if not validate_port(p):
         print("Error: the port number must be between 1-65535.")
         sys.exit(1)
@@ -48,10 +51,10 @@ def portscan(h, p, t=0.5):
 
         try:
             s.connect((h, p))
-            print(f"{p}/tcp → open")
+            return f"{p}/tcp → open"
         except TimeoutError:
-            print(f"{p}/tcp → inconclusive (timeout)")
+            return f"{p}/tcp → inconclusive (timeout)"
         except ConnectionRefusedError:
-            print(f"{p}/tcp → closed")
+            return f"{p}/tcp → closed"
         finally:
             s.close()
