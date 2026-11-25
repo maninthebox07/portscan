@@ -56,5 +56,7 @@ def portscan(p, h, t=0.5):
             return f"{p}/tcp → inconclusive (timeout)"
         except ConnectionRefusedError:
             return f"{p}/tcp → closed"
+        except OSError as e:
+            return f"{p}/tcp → error ({e.strerror or str(e)})"
         finally:
             s.close()
