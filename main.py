@@ -8,17 +8,46 @@ from functools import partial
 
 TARGET = None
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(
+    description="TCP port scanner",
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+)
 
-parser.add_argument("host")
-parser.add_argument("-p", "--port", required=True)
-parser.add_argument("-t", "--timeout", type=float, default=0.5)
-parser.add_argument("-w", "--workers", type=int, default=10)
+parser.add_argument("host", help="Hostname or IPv4 address to scan.")
+
+parser.add_argument(
+    "-p",
+    "--port",
+    required=True,
+    metavar="PORTS",
+    help="Port(s) to scan. Accepts a single port, a comma-separated list or a range.",
+)
+
+parser.add_argument(
+    "-t",
+    "--timeout",
+    type=float,
+    default=0.5,
+    metavar="SECONDS",
+    help="Connection timeout.",
+)
+
+parser.add_argument(
+    "-w",
+    "--workers",
+    type=int,
+    default=10,
+    metavar="N",
+    help="Maximum number of concurrent workers.",
+)
 
 args = parser.parse_args()
 
 if args.workers < 1:
     parser.error("workers must be at least 1")
+
+if args.timeout <= 0:
+    parser.error("timeout must be greater than 0")
 
 try:
     TARGET = str(ipaddress.ip_address(args.host))
