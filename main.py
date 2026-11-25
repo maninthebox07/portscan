@@ -5,6 +5,7 @@ import argparse
 from scanner import parse_ports, portscan
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
+from output import save_results
 
 TARGET = None
 
@@ -48,6 +49,15 @@ parser.add_argument(
     help="Show only open ports.",
 )
 
+parser.add_argument(
+    "-O",
+    "--output",
+    type=str,
+    default=None,
+    metavar="FILE",
+    help="Save scan results to a file.",
+)
+
 args = parser.parse_args()
 
 if args.workers < 1:
@@ -75,14 +85,24 @@ except ValueError as e:
 scan = partial(portscan, h=TARGET, t=args.timeout)
 
 found_open = False
+results = []
 
 with ThreadPoolExecutor(max_workers=args.workers) as executor:
     for line in executor.map(scan, ports):
         if not args.open or line.endswith("→ open"):
             print(line)
+            results.append(line)
 
             if line.endswith("→ open"):
                 found_open = True
+
+if args.output is not None:
+    try:
+        save_results(results, args.output)
+        print(f"Results saved to {args.output}")
+    except OSError as e:
+        print(f"Error saving results: {e}")
+        sys.exit(1)
 
 if args.open and not found_open:
     print("No open ports found.")
