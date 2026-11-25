@@ -41,6 +41,13 @@ parser.add_argument(
     help="Maximum number of concurrent workers.",
 )
 
+parser.add_argument(
+    "-o",
+    "--open",
+    action="store_true",
+    help="Show only open ports.",
+)
+
 args = parser.parse_args()
 
 if args.workers < 1:
@@ -67,6 +74,15 @@ except ValueError as e:
 
 scan = partial(portscan, h=TARGET, t=args.timeout)
 
+found_open = False
+
 with ThreadPoolExecutor(max_workers=args.workers) as executor:
     for line in executor.map(scan, ports):
-        print(line)
+        if not args.open or line.endswith("→ open"):
+            print(line)
+
+            if line.endswith("→ open"):
+                found_open = True
+
+if args.open and not found_open:
+    print("No open ports found.")
