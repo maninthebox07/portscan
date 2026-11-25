@@ -38,7 +38,7 @@ def parse_ports(port_spec):
         if not validate_port(port):
             raise ValueError("Error: invalid entry")
 
-    return ports
+    return list(dict.fromkeys(ports))
 
 
 def portscan(p, h, t=0.5):
