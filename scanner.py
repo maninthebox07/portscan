@@ -1,11 +1,11 @@
 import socket
 
 
-def validate_port(port):
+def validate_port(port: int) -> bool:
     return isinstance(port, int) and not isinstance(port, bool) and 1 <= port <= 65535
 
 
-def parse_ports(port_spec):
+def parse_ports(port_spec: str) -> list[int]:
     ports = []
 
     if "-" in port_spec:
@@ -43,7 +43,7 @@ def parse_ports(port_spec):
     return list(dict.fromkeys(ports))
 
 
-def portscan(p, h, t=0.5):
+def portscan(p: int, h: str, t: float = 0.5) -> str:
     if not validate_port(p):
         raise ValueError("Error: the port number must be between 1-65535.")
 
