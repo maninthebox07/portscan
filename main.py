@@ -74,13 +74,13 @@ except ValueError:
         TARGET = TARGET[0][4][0]
     except socket.gaierror:
         print("Error: unable to resolve host.")
-        sys.exit(1)
+        sys.exit(2)
 
 try:
     ports = parse_ports(args.port)
 except ValueError as e:
     print(e)
-    sys.exit(1)
+    sys.exit(2)
 
 scan = partial(portscan, h=TARGET, t=args.timeout)
 
