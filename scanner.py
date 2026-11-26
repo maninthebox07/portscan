@@ -2,10 +2,33 @@ import socket
 
 
 def validate_port(port: int) -> bool:
+    """
+    Check whether a port number is within the valid range.
+
+    Args:
+        port: Port number to validate.
+
+    Returns:
+        True if the port is valid, False otherwise.
+    """
     return isinstance(port, int) and not isinstance(port, bool) and 1 <= port <= 65535
 
 
 def parse_ports(port_spec: str) -> list[int]:
+    """
+    Parse a port specification into a list of unique port numbers.
+
+    Accepts a single port, a comma-separated list, or an interval.
+
+    Args:
+        port_spec: Port specification to parse.
+
+    Returns:
+        A list of unique port numbers, preserving their original order.
+
+    Raises:
+        ValueError: If the port specification is invalid.
+    """
     ports = []
 
     if "-" in port_spec:
@@ -44,6 +67,21 @@ def parse_ports(port_spec: str) -> list[int]:
 
 
 def portscan(p: int, h: str, t: float = 0.5) -> str:
+    """
+    Scan a TCP port on a target host.
+
+    Args:
+        p: TCP port number to scan.
+        h: Target host IP address.
+        t: Connection timeout in seconds.
+
+    Returns:
+        A string describing the port status: open, closed,
+        inconclusive, or error.
+
+    Raises:
+        ValueError: If the port number is invalid.
+    """
     if not validate_port(p):
         raise ValueError("Error: the port number must be between 1-65535.")
 
