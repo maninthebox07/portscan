@@ -1,15 +1,17 @@
 import socket
-import sys
 
 
 def validate_port(port):
-    return not (port < 1 or port > 65535)
+    return isinstance(port, int) and not isinstance(port, bool) and 1 <= port <= 65535
 
 
 def parse_ports(port_spec):
     ports = []
 
     if "-" in port_spec:
+        if port_spec.count("-") != 1:
+            raise ValueError("Error: invalid port interval")
+
         start, end = port_spec.split("-")
         try:
             start, end = int(start), int(end)
@@ -43,20 +45,19 @@ def parse_ports(port_spec):
 
 def portscan(p, h, t=0.5):
     if not validate_port(p):
-        print("Error: the port number must be between 1-65535.")
-        sys.exit(1)
-    else:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(t)
+        raise ValueError("Error: the port number must be between 1-65535.")
 
-        try:
-            s.connect((h, p))
-            return f"{p}/tcp → open"
-        except TimeoutError:
-            return f"{p}/tcp → inconclusive (timeout)"
-        except ConnectionRefusedError:
-            return f"{p}/tcp → closed"
-        except OSError as e:
-            return f"{p}/tcp → error ({e.strerror or str(e)})"
-        finally:
-            s.close()
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(t)
+
+    try:
+        s.connect((h, p))
+        return f"{p}/tcp → open"
+    except TimeoutError:
+        return f"{p}/tcp → inconclusive (timeout)"
+    except ConnectionRefusedError:
+        return f"{p}/tcp → closed"
+    except OSError as e:
+        return f"{p}/tcp → error ({e.strerror or str(e)})"
+    finally:
+        s.close()

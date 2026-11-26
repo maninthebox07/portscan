@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from scanner import parse_ports, portscan
+from scanner import parse_ports, portscan, validate_port
 
 
 def test_single_port():
@@ -105,3 +105,11 @@ def test_portscan_socket_error():
         result = portscan(80, "127.0.0.1")
 
         assert result == "80/tcp → error (Network is unreachable)"
+
+
+def test_validate_port_float():
+    assert not validate_port(80.5)
+
+
+def test_validate_port_boolean():
+    assert not validate_port(True)
